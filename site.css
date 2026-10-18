@@ -1,0 +1,22 @@
+:root{--ink:#0E1A14;--ink2:#17271E;--paper:#F3F6F2;--line:#D5DDD6;--muted:#55665B;--lime:#8CC63F;--unt:#00853E;--blue:#3FA9FF;--red:#B3261E;
+--h:"Bricolage Grotesque","Trebuchet MS",Arial,sans-serif;--b:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.05rem/1.7 var(--b)}
+h1,h2,h3{font-family:var(--h);line-height:1.1;margin:0}h2{font-size:1.9rem;font-weight:800}h3{font-size:1.4rem;font-weight:600}
+p{margin:0 0 1rem;max-width:68ch}a{color:var(--unt)}img{max-width:100%;display:block}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.w{max-width:1000px;margin:0 auto;padding:0 1.5rem}button,input,select,textarea{font:inherit}button{cursor:pointer}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,26,20,.88);backdrop-filter:blur(10px)}
+nav .w{max-width:1100px;display:flex;align-items:center;gap:1.4rem;padding-top:.75rem;padding-bottom:.75rem;overflow-x:auto;white-space:nowrap}
+nav strong{font:800 1.25rem var(--h);color:#fff;margin-right:auto}nav a{color:#D7E3DA;text-decoration:none;font-weight:600;font-size:.95rem}nav a:hover,nav a[aria-current]{color:var(--lime)}
+.hero{background:radial-gradient(circle at 80% 40%,#24401F 0,var(--ink) 60%);color:#fff;padding:3.5rem 0 3rem}
+.hero h1{font-size:clamp(2.6rem,8vw,4.6rem);font-weight:800;letter-spacing:-.03em}.hero p{color:#C7D6CB;font-size:1.15rem;margin:.9rem 0 0}
+main{padding:2.5rem 0 5rem}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:99px;padding:.6rem 1.5rem;font-weight:700}.btn:hover{background:var(--unt)}.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}.btn.ghost:hover{background:var(--ink);color:#fff}
+.btn.del{background:transparent;color:var(--red);border:2px solid var(--red);padding:.2rem .9rem;font-size:.9rem}
+.msg{font-weight:600;margin-top:.8rem}.msg.err{color:var(--red)}.msg.ok{color:var(--unt)}
+.note{background:#FBEBC8;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.5rem}
+dialog{border:0;border-radius:18px;padding:1rem;max-width:min(900px,92vw);background:#fff}dialog::backdrop{background:rgba(14,26,20,.8)}
+dialog img{max-height:75vh;margin:0 auto;object-fit:contain}dialog p{margin:.7rem 0 0;text-align:center}
+footer{background:var(--ink);color:#B9CBBE;padding:2rem 0;font-size:.95rem}footer a{color:#fff}
