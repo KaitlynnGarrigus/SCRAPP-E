@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>References | SCRAPP-E</title>
+<meta name="description" content="The documents behind SCRAPP-E: requirements, traceability matrix, project scope, and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.chip{border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:99px;padding:.3rem 1rem;font-weight:700;font-size:.95rem}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.4rem}
+.ref{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.4rem;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.ref:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(14,26,20,.1)}
+.badges{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+.bd{font:700 .8rem var(--b);padding:.1rem .65rem;border-radius:99px;background:#E2E7E3;color:var(--muted)}
+.bd.doc{background:#DCEBFA;color:#1D4F85}.bd.sheet{background:#DDF0D8;color:#1E6B2A}.bd.slides{background:#FBEBC8;color:#8A5A00}.bd.pdf{background:#F8DAD7;color:#8C1D18}
+.ref h3{margin-bottom:.4rem}.ref p{color:var(--muted);font-size:.98rem;flex:1}
+.acts{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem}.acts .btn{text-decoration:none;font-size:.92rem;padding:.4rem 1.1rem;display:inline-block}
+#pv{width:min(1000px,95vw)}#pv iframe{width:100%;height:75vh;border:0;border-radius:10px;margin-top:.7rem}
+.empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<nav><div class="w"><strong>SCRAPP-E</strong>
+<a href="index.html">Home</a><a href="updates.html">Updates</a><a href="index.html#build">The build</a><a href="gallery.html">Gallery</a><a href="references.html" aria-current="page">References</a><a href="team.html">Team</a></div></nav>
+
+<header class="hero"><div class="w">
+  <h1>References</h1>
+  <p>The documents behind the project: requirements, the traceability matrix, project scope, and more.</p>
+</div></header>
+
+<main><div class="w">
+  <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+  <p class="note" id="note" hidden></p>
+  <div class="grid" id="grid" aria-live="polite"></div>
+</div></main>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a> | <a href="admin.html">Team login</a></div></footer>
+<dialog id="pv"><div style="display:flex;justify-content:space-between;align-items:center;gap:1rem"><b id="pvt"></b><button class="btn" id="pvx">Close</button></div><iframe id="pvf" title="Document preview"></iframe></dialog>
+
+<script type="module">
+import {firebaseConfig as cfg} from './firebase-config.js';
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const safe=u=>/^https?:\/\//i.test(u)||/^[\w][\w.\-\/]*$/.test(u);
+function kind(u){
+  if(/docs\.google\.com\/document/.test(u))return['Google Doc','doc'];
+  if(/docs\.google\.com\/spreadsheets/.test(u))return['Google Sheet','sheet'];
+  if(/docs\.google\.com\/presentation/.test(u))return['Google Slides','slides'];
+  if(/\.pdf($|\?)/i.test(u))return['PDF','pdf'];
+  if(/\.(xlsx|xls|csv)($|\?)/i.test(u))return['Spreadsheet file','sheet'];
+  if(/\.(docx|doc)($|\?)/i.test(u))return['Word file','doc'];
+  if(/\.pptx($|\?)/i.test(u))return['Slides file','slides'];
+  return['Link','']}
+function preview(u){const m=u.match(/^(https:\/\/docs\.google\.com\/(?:document|spreadsheets|presentation)\/d\/[^/?#]+)/);
+  return m?m[1]+'/preview':/\.pdf($|\?)/i.test(u)?u:null}
+
+let refs=[],cat='';
+function render(){
+  const cats=[...new Set(refs.map(r=>r.cat).filter(Boolean))],ch=$('#chips');ch.innerHTML='';
+  if(cats.length)['',...cats].forEach(c=>{const b=el('button','chip',c||'All');b.setAttribute('aria-pressed',c===cat);b.onclick=()=>{cat=c;render()};ch.append(b)});
+  const g=$('#grid');g.innerHTML='';const list=refs.filter(r=>!cat||r.cat===cat);
+  if(!list.length)g.append(el('p','empty','No references have been posted yet.'));
+  list.forEach(r=>{if(!safe(r.url))return;
+    const [k,c]=kind(r.url),card=el('article','ref'),bd=el('div','badges');
+    bd.append(el('span','bd '+c,k));if(r.cat)bd.append(el('span','bd',r.cat));
+    card.append(bd,el('h3','',r.title));if(r.desc)card.append(el('p','',r.desc));else card.append(el('p',''));
+    const a=el('div','acts'),o=el('a','btn','Open');o.href=r.url;o.target='_blank';o.rel='noopener';a.append(o);
+    const pu=preview(r.url);if(pu){const p=el('button','btn ghost','Preview');p.onclick=()=>{$('#pvt').textContent=r.title;$('#pvf').src=pu;$('#pv').showModal()};a.append(p)}
+    card.append(a);g.append(card)})}
+$('#pvx').onclick=()=>$('#pv').close();$('#pv').addEventListener('close',()=>{$('#pvf').src='about:blank'});
+
+const note=t=>{$('#note').textContent=t;$('#note').hidden=false};
+if(cfg.apiKey.startsWith('PASTE'))note('References will appear here once the database is connected.');
+else{try{
+  const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const {getFirestore,collection,getDocs,query,orderBy}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const s=await getDocs(query(collection(getFirestore(initializeApp(cfg)),'refs'),orderBy('created','desc')));
+  refs=s.docs.map(d=>d.data());
+}catch(e){note('References could not be loaded right now.')}}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The team | SCRAPP-E</title>
+<meta name="description" content="Meet the UNT students building SCRAPP-E: roles, contact info, and LinkedIn profiles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0E1A14;--ink2:#17271E;--paper:#F3F6F2;--line:#D5DDD6;--muted:#55665B;--lime:#8CC63F;--unt:#00853E;--blue:#3FA9FF;
+--h:"Bricolage Grotesque","Trebuchet MS",Arial,sans-serif;--b:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.05rem/1.7 var(--b)}
+h1,h2,h3{font-family:var(--h);line-height:1.08;margin:0}h3{font-size:1.35rem;font-weight:600}
+p{margin:0 0 1rem;max-width:66ch}a{color:var(--unt)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.w{max-width:1100px;margin:0 auto;padding:0 1.5rem}button{font:inherit;cursor:pointer}
+
+nav{position:sticky;top:0;z-index:20;background:rgba(14,26,20,.88);backdrop-filter:blur(10px)}
+nav .w{display:flex;align-items:center;gap:1.4rem;padding-top:.75rem;padding-bottom:.75rem;overflow-x:auto;white-space:nowrap}
+nav strong{font:800 1.25rem var(--h);color:#fff;margin-right:auto}nav a{color:#D7E3DA;text-decoration:none;font-weight:600;font-size:.95rem}nav a:hover,nav a[aria-current]{color:var(--lime)}
+
+.hero{background:radial-gradient(circle at 80% 40%,#24401F 0,var(--ink) 60%);color:#fff;padding:4rem 0 3.5rem}
+.hero h1{font-size:clamp(2.8rem,8vw,5rem);font-weight:800;letter-spacing:-.03em}
+.hero p{color:#C7D6CB;font-size:1.15rem;margin:1rem 0 0}
+
+main{padding:3rem 0 5rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem}
+.chip{border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:99px;padding:.3rem 1rem;font-weight:700;font-size:.95rem}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(14,26,20,.12)}
+.card[hidden]{display:none}
+.ph{aspect-ratio:1;background:#DDE6DE;display:grid;place-items:center;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph span{font:800 4rem var(--h);color:#fff;letter-spacing:-.02em}
+.body{padding:1.1rem 1.2rem 1.3rem;display:flex;flex-direction:column;flex:1}
+.tag{align-self:flex-start;font:700 .8rem var(--b);padding:.1rem .65rem;border-radius:99px;background:#DDF0D8;color:#1E6B2A;margin-bottom:.6rem}
+.tag.cs{background:#DCEBFA;color:#1D4F85}
+.role{color:var(--muted);font-size:.98rem;margin:.25rem 0 .9rem;line-height:1.45}
+.mail{word-break:break-all;font-size:.92rem;margin-bottom:1rem}
+.li{margin-top:auto;align-self:flex-start;display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:.92rem;padding:.4rem 1rem;border-radius:99px}
+.li:hover{background:var(--unt)}
+.note{color:var(--muted);font-size:.9rem;margin-top:2.5rem}
+
+footer{background:var(--ink);color:#B9CBBE;padding:2rem 0;font-size:.95rem}footer a{color:#fff}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav><div class="w"><strong>SCRAPP-E</strong>
+<a href="index.html">Home</a><a href="updates.html">Updates</a><a href="index.html#build">The build</a><a href="gallery.html">Gallery</a><a href="references.html">References</a><a href="team.html" aria-current="page">Team</a></div></nav>
+
+<header class="hero"><div class="w">
+  <h1>Meet the team</h1>
+  <p>Seven UNT students building a recycled, modular robot to help people live more independently.</p>
+</div></header>
+
+<main><div class="w">
+  <div class="chips" role="group" aria-label="Filter the team">
+    <button class="chip" data-g="all" aria-pressed="true">Everyone</button>
+    <button class="chip" data-g="mech" aria-pressed="false">Mechanical</button>
+    <button class="chip" data-g="cs" aria-pressed="false">Computer Science</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="note">Photos: save each person's picture in the same folder as this page, named like <b>kaitlynn-garrigus.jpg</b> (lowercase, first and last name). Until a photo is added, their initials are shown.</p>
+</div></main>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a>.</div></footer>
+
+<script>
+// TO ADD OR EDIT A PERSON: change this list. g is mech or cs. Leave li empty ('') if there is no LinkedIn.
+const team=[
+ {n:'Kaitlynn Garrigus',s:'kaitlynn-garrigus',r:'Project Lead',g:'mech',e:'KaitlynnGarrigus@my.unt.edu',li:'https://www.linkedin.com/in/kaitlynn-garrigus-6992862a3'},
+ {n:'Preston Fager',s:'preston-fager',r:'Mechanical Team Lead',g:'mech',e:'PrestonFager@my.unt.edu',li:'https://www.linkedin.com/in/preston-fager-193bca/'},
+ {n:'Hamza Hindi',s:'hamza-hindi',r:'Internal Systems',g:'mech',e:'HamzaHindi@my.unt.edu',li:'https://www.linkedin.com/in/hamza-hindi-29b607267/'},
+ {n:'Jonathan Clarke',s:'jonathan-clarke',r:'Arm Systems',g:'mech',e:'JonathanClarke@my.unt.edu',li:''},
+ {n:'Srikara Badhrinarayanan',s:'srikara-badhrinarayanan',r:'Gripper Systems',g:'mech',e:'SrikaraBadhrinarayanan@my.unt.edu',li:'https://www.linkedin.com/in/srikarab/'},
+ {n:'Truitt Crozier',s:'truitt-crozier',r:'Internal Systems',g:'cs',e:'TruittCrozier@my.unt.edu',li:'https://www.linkedin.com/in/truitt-crozier/'},
+ {n:'Ashley Tackett',s:'ashley-tackett',r:'Computer Science Team Lead, External Systems',g:'cs',e:'AshleyTackett2@my.unt.edu',li:'https://www.linkedin.com/in/ashley-tackett-231a642a0/'}
+];
+const label={mech:'Mechanical',cs:'Computer Science'};
+const colors=['#00853E','#2F6F9F','#6B8F23','#7A5C99','#B7790A','#2A7F7F','#A04A4A','#4A5B8C'];
+const grid=document.getElementById('grid');
+
+team.forEach((p,k)=>{
+  const c=document.createElement('article');c.className='card';c.dataset.g=p.g;
+  const ini=p.n.replace('Dr. ','').split(' ').map(w=>w[0]).slice(0,2).join('');
+  c.innerHTML=`<div class="ph" style="background:${colors[k%colors.length]}"></div>
+  <div class="body"><span class="tag ${p.g}">${label[p.g]}</span><h3>${p.n}</h3><p class="role">${p.r}</p>
+  <a class="mail" href="mailto:${p.e}">${p.e}</a>${p.li?`<a class="li" href="${p.li}" target="_blank" rel="noopener">LinkedIn</a>`:''}</div>`;
+  const ph=c.querySelector('.ph'),exts=['jpg','jpeg','png','webp'];let i=0;
+  const img=new Image();img.alt='Photo of '+p.n;
+  const fallback=()=>{ph.innerHTML=`<span aria-hidden="true">${ini}</span>`};
+  img.onload=()=>{ph.style.background='#DDE6DE';ph.innerHTML='';ph.append(img)};
+  img.onerror=()=>{i++;i<exts.length?img.src=`${p.s}.${exts[i]}`:fallback()};
+  img.src=`${p.s}.${exts[0]}`;
+  grid.append(c);
+});
+
+document.querySelectorAll('[data-g]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>{
+  document.querySelectorAll('button[data-g]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  grid.querySelectorAll('.card').forEach(c=>c.hidden=b.dataset.g!=='all'&&c.dataset.g!==b.dataset.g)}});
+</script>
+</body>
+</html>

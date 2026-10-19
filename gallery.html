@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gallery | SCRAPP-E</title>
+<meta name="description" content="Photos from the SCRAPP-E team's project updates, plus design renders from the build.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0 1.5rem}
+.chip{border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:99px;padding:.3rem 1rem;font-weight:700;font-size:.95rem}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff}
+.gal{columns:3 260px;column-gap:1rem}
+.tile{position:relative;break-inside:avoid;margin:0 0 1rem}
+.tile .open{display:block;width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;padding:.8rem;text-align:left;transition:transform .15s}
+.tile .open:hover{transform:translateY(-3px)}.tile img{width:100%;border-radius:8px}.cad{mix-blend-mode:multiply}
+.tile span{display:block;font-size:.88rem;color:var(--muted);margin-top:.5rem;line-height:1.4}
+.star{position:absolute;top:1.15rem;right:1.15rem;width:42px;height:42px;border-radius:50%;border:0;background:rgba(14,26,20,.8);color:#fff;font-size:1.35rem;line-height:1}
+.star.on{background:#F2B705;color:#14210F}
+.alt{background:#E8EEE8;padding:3.5rem 0 4rem}
+.empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<nav><div class="w"><strong>SCRAPP-E</strong>
+<a href="index.html">Home</a><a href="updates.html">Updates</a><a href="index.html#build">The build</a><a href="gallery.html" aria-current="page">Gallery</a><a href="references.html">References</a><a href="team.html">Team</a></div></nav>
+
+<header class="hero"><div class="w">
+  <h1>Gallery</h1>
+  <p>See what we have been building. Photos attached to our updates show up here automatically.</p>
+</div></header>
+
+<main><div class="w">
+  <h2>Team photos</h2>
+  <div class="chips" role="group" aria-label="Filter photos">
+    <button class="chip" data-s="0" aria-pressed="true">All photos</button>
+    <button class="chip" data-s="1" aria-pressed="false">Featured on home page</button>
+  </div>
+  <p class="note" id="adminNote" hidden>You are signed in. Click the star on any photo to feature it on the home page, and click it again to remove it.</p>
+  <p class="note" id="note" hidden></p>
+  <div class="gal" id="team" aria-live="polite"></div>
+</div></main>
+
+<section class="alt"><div class="w">
+  <h2>Design renders</h2>
+  <p style="color:var(--muted)">CAD renders and hardware from the build.</p>
+  <div class="gal" id="designs" style="margin-top:1.5rem"></div>
+</div></section>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a> | <a href="admin.html">Team login</a></div></footer>
+<dialog id="dlg"><button class="btn" id="dx" style="float:right">Close</button><img id="dimg" alt=""><p id="dcap"></p><p id="dlink" style="font-size:.95rem"></p></dialog>
+
+<script type="module">
+import {firebaseConfig as cfg} from './firebase-config.js';
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const fmt=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+let posts=[],admin=false,only=false,F=null,db=null;
+
+function open(src,alt,cap,link){$('#dimg').src=src;$('#dimg').alt=alt;$('#dcap').textContent=cap;
+  const l=$('#dlink');l.innerHTML='';if(link){const a=el('a','',link);a.href='updates.html';l.append('From the update: ',a)}$('#dlg').showModal()}
+$('#dx').onclick=()=>$('#dlg').close();$('#dlg').onclick=e=>{if(e.target.id==='dlg')$('#dlg').close()};
+
+// Design renders (static). Add more by adding a line here and uploading the image.
+[['cad-assembly.jpg','Chassis and tank tracks, CAD render'],['track-assembly.jpg','Tank-track assembly'],['cad-neck.jpg','Chassis with neck arm, CAD render'],['suspension.jpg','Track suspension, CAD render'],['chassis-frame.jpg','Early chassis frame, CAD render'],['gripper.jpg','Gripper concept, CAD render'],['wheel.jpg','Drive wheel, CAD render']].forEach(([f,c])=>{
+  const t=el('div','tile'),b=el('button','open'),i=el('img','cad');i.src=f;i.alt=c;i.loading='lazy';b.append(i,el('span','',c));b.onclick=()=>open(f,c,c);t.append(b);$('#designs').append(t)});
+
+async function toggle(t){
+  const photos=t.p.photos.map(x=>({...x}));photos[t.i].star=!photos[t.i].star;
+  try{await F.updateDoc(F.doc(db,'posts',t.p.id),{photos,hasStar:photos.some(x=>x.star)});t.p.photos=photos;render()}
+  catch(e){alert('Could not save the star. Check that you are signed in and try again.')}}
+
+function render(){
+  const g=$('#team');g.innerHTML='';$('#adminNote').hidden=!admin;
+  const tiles=[];posts.forEach(p=>(p.photos||[]).forEach((ph,i)=>tiles.push({p,i,ph})));
+  const list=tiles.filter(t=>!only||t.ph.star);
+  if(!list.length)g.append(el('p','empty',only?'No photos are featured yet.':'No team photos yet. Photos added to a project update will appear here.'));
+  list.forEach(t=>{const {p,ph}=t,cap=ph.c||p.title;
+    const d=el('div','tile'),b=el('button','open'),i=el('img');i.src=ph.s;i.alt=cap;i.loading='lazy';
+    b.append(i,el('span','',(ph.c?ph.c+'. ':'')+p.author+', '+fmt(p.date)));b.onclick=()=>open(ph.s,cap,(ph.c?ph.c+' | ':'')+p.author+', '+fmt(p.date),p.title);d.append(b);
+    if(admin){const s=el('button','star'+(ph.star?' on':''),ph.star?'\u2605':'\u2606');s.type='button';s.setAttribute('aria-label',ph.star?'Remove from home page':'Feature on home page');s.setAttribute('aria-pressed',!!ph.star);s.onclick=()=>toggle(t);d.append(s)}
+    g.append(d)})}
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{only=b.dataset.s==='1';document.querySelectorAll('[data-s]').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+
+if(cfg.apiKey.startsWith('PASTE')){$('#note').textContent='Team photos will appear here once the database is connected.';$('#note').hidden=false}
+else{try{
+  const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),U=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+  F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const app=A.initializeApp(cfg);db=F.getFirestore(app);
+  U.onAuthStateChanged(U.getAuth(app),u=>{admin=!!u;render()});
+  const s=await F.getDocs(F.query(F.collection(db,'posts'),F.orderBy('date','desc')));
+  posts=s.docs.map(d=>({id:d.id,...d.data()}));
+}catch(e){$('#note').textContent='Team photos could not be loaded right now.';$('#note').hidden=false}}
+render();
+</script>
+</body>
+</html>
