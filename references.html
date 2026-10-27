@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>References | SCRAPP-E</title>
+<meta name="description" content="The documents behind SCRAPP-E, organized by folder: team assignments, mechanical and electrical systems, meetings, and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+.folders{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2.2rem 1.5rem;padding-top:1rem}
+.folder{position:relative;display:block;text-decoration:none;color:var(--ink);background:#CFE8A8;border-radius:4px 14px 14px 14px;padding:1.5rem 1.3rem 1.3rem;min-height:160px;box-shadow:0 6px 14px rgba(14,26,20,.14);transition:transform .15s}
+.folder::before{content:"";position:absolute;top:-16px;left:0;width:96px;height:18px;background:#8CC63F;border-radius:10px 10px 0 0}
+.folder:hover{transform:translateY(-4px)}.folder h3{font-size:1.35rem;margin-bottom:.4rem}
+.folder small{display:block;color:#33472A;line-height:1.4}.folder b{display:block;margin-top:.8rem;font-size:.92rem}
+.crumb{margin-bottom:1rem;font-weight:700}.crumb a{color:var(--unt)}
+.top h2{margin:0}
+.tabsr{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.2rem 0 2rem}
+.tabsr a{border:2px solid var(--ink);border-radius:99px;padding:.3rem 1rem;text-decoration:none;color:var(--ink);font-weight:700;font-size:.95rem;background:#fff}
+.tabsr a[aria-current=true]{background:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.4rem}
+.ref{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.4rem;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.ref:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(14,26,20,.1)}
+.badges{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+.bd{font:700 .8rem var(--b);padding:.1rem .65rem;border-radius:99px;background:#E2E7E3;color:var(--muted)}
+.bd.doc{background:#DCEBFA;color:#1D4F85}.bd.sheet{background:#DDF0D8;color:#1E6B2A}.bd.slides{background:#FBEBC8;color:#8A5A00}.bd.pdf{background:#F8DAD7;color:#8C1D18}
+.ref h3{margin-bottom:.4rem}.ref p{color:var(--muted);font-size:.98rem;flex:1}
+.acts{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem}.acts .btn{text-decoration:none;font-size:.92rem;padding:.4rem 1.1rem;display:inline-block}
+#pv{width:min(1000px,95vw)}#pv iframe{width:100%;height:75vh;border:0;border-radius:10px;margin-top:.7rem}
+.empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<nav><div class="w"><strong>SCRAPP-E</strong>
+<a href="index.html">Home</a><a href="updates.html">Updates</a><a href="index.html#build">The build</a><a href="gallery.html">Gallery</a><a href="references.html" aria-current="page">References</a><a href="team.html">Team</a></div></nav>
+
+<header class="hero"><div class="w">
+  <h1>References</h1>
+  <p>The documents behind the project, organized by folder.</p>
+</div></header>
+
+<main><div class="w">
+  <p class="note" id="note" hidden></p>
+  <div id="view" aria-live="polite"></div>
+</div></main>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a> | <a href="admin.html">Team login</a></div></footer>
+<dialog id="pv"><div style="display:flex;justify-content:space-between;align-items:center;gap:1rem"><b id="pvt"></b><button class="btn" id="pvx">Close</button></div><iframe id="pvf" title="Document preview"></iframe></dialog>
+
+<script type="module">
+import {firebaseConfig as cfg} from './firebase-config.js';
+import {folders as base} from './ref-folders.js';
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const slug=n=>n.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const safe=u=>/^https?:\/\//i.test(u)||/^[\w][\w.\-\/]*$/.test(u);
+function kind(u){
+  if(/docs\.google\.com\/document/.test(u))return['Google Doc','doc'];
+  if(/docs\.google\.com\/spreadsheets/.test(u))return['Google Sheet','sheet'];
+  if(/docs\.google\.com\/presentation/.test(u))return['Google Slides','slides'];
+  if(/\.pdf($|\?)/i.test(u))return['PDF','pdf'];
+  if(/\.(xlsx|xls|csv)($|\?)/i.test(u))return['Spreadsheet file','sheet'];
+  if(/\.(docx|doc)($|\?)/i.test(u))return['Word file','doc'];
+  if(/\.pptx($|\?)/i.test(u))return['Slides file','slides'];
+  return['Link','']}
+function preview(u){const m=u.match(/^(https:\/\/docs\.google\.com\/(?:document|spreadsheets|presentation)\/d\/[^/?#]+)/);
+  return m?m[1]+'/preview':/\.pdf($|\?)/i.test(u)?u:null}
+
+// Where a reference lives. References saved before folders existed are sorted by their old category word.
+const legacy=[[/rtm|traceab/,'Team Assignments','Traceability Matrix'],[/scope/,'Team Assignments','Project Scope Definition'],[/requirement/,'Team Assignments','Development of Requirements'],[/house|quality/,'Team Assignments','House of Quality'],[/fund|budget/,'Managerial Work','Funding'],[/cad/,'Mechanical Systems','CAD'],[/research/,'Mechanical Systems','Research'],[/minute|meeting/,'Meetings & Presentations','Meeting Minutes'],[/present/,'Meetings & Presentations','Presentation']];
+function place(r){if(r.folder)return{f:r.folder,t:r.tab||''};const c=(r.cat||'').toLowerCase();
+  for(const [re,f,t] of legacy)if(re.test(c))return{f,t};return{f:'Other',t:''}}
+let refs=[];
+const folders=()=>base.concat(refs.some(r=>!base.find(f=>f.n===place(r).f))?[{n:'Other',tabs:[]}]:[]);
+const inFolder=f=>refs.filter(r=>place(r).f===f.n);
+
+function card(r){const [k,c]=kind(r.url),a=el('article','ref'),bd=el('div','badges');
+  bd.append(el('span','bd '+c,k));a.append(bd,el('h3','',r.title),el('p','',r.desc||''));
+  const b=el('div','acts'),o=el('a','btn','Open');o.href=r.url;o.target='_blank';o.rel='noopener';b.append(o);
+  const pu=preview(r.url);if(pu){const p=el('button','btn ghost','Preview');p.type='button';p.onclick=()=>{$('#pvt').textContent=r.title;$('#pvf').src=pu;$('#pv').showModal()};b.append(p)}
+  a.append(b);return a}
+
+function home(v){
+  const g=el('div','folders');
+  folders().forEach(f=>{const a=el('a','folder'),n=inFolder(f).length;a.href='#'+slug(f.n);
+    a.append(el('h3','',f.n),el('small','',f.tabs.length?f.tabs.join(', '):'Documents'),el('b','',n+(n===1?' document':' documents')));g.append(a)});
+  v.append(g)}
+function folder(v,f,ts){
+  const crumb=el('p','crumb'),back=el('a','','All folders');back.href='#';crumb.append(back,' / '+f.n);v.append(crumb,el('h2','',f.n));
+  const tab=f.tabs.find(t=>slug(t)===ts)||'',all=inFolder(f);
+  if(f.tabs.length){const bar=el('div','tabsr');bar.setAttribute('aria-label','Tabs');
+    [['','All'],...f.tabs.map(t=>[t,t])].forEach(([t,l])=>{const a=el('a','',l+' ('+all.filter(r=>!t||place(r).t===t).length+')');a.href='#'+slug(f.n)+(t?'/'+slug(t):'');a.setAttribute('aria-current',t===tab);bar.append(a)});v.append(bar)}
+  const l=all.filter(r=>!tab||place(r).t===tab);
+  if(!l.length)v.append(el('p','empty',tab?'No documents in this tab yet.':'No documents in this folder yet.'));
+  else{const g=el('div','grid');l.forEach(r=>{if(safe(r.url))g.append(card(r))});v.append(g)}}
+function render(){const v=$('#view');v.innerHTML='';const [fs,ts]=location.hash.slice(1).split('/'),f=folders().find(x=>slug(x.n)===fs);f?folder(v,f,ts):home(v);if(f)window.scrollTo(0,0)}
+addEventListener('hashchange',render);
+$('#pvx').onclick=()=>$('#pv').close();$('#pv').addEventListener('close',()=>{$('#pvf').src='about:blank'});
+
+const note=t=>{$('#note').textContent=t;$('#note').hidden=false};
+if(cfg.apiKey.startsWith('PASTE'))note('References will appear here once the database is connected.');
+else{try{
+  const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const {getFirestore,collection,getDocs,query,orderBy}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const s=await getDocs(query(collection(getFirestore(initializeApp(cfg)),'refs'),orderBy('created','desc')));
+  refs=s.docs.map(d=>d.data());
+}catch(e){note('References could not be loaded right now.')}}
+render();
+</script>
+</body>
+</html>
