@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Timecard | SCRAPP-E</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.8rem;max-width:640px;margin-bottom:1.5rem}
+.card h2{margin-bottom:.4rem}label{display:block;font-weight:700;margin:1.1rem 0 .3rem}
+input[type=text],input[type=email],input[type=password],input[type=date],input[type=time],select,textarea{width:100%;padding:.6rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--unt);outline:none}textarea{min-height:90px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.hint{color:var(--muted);font-size:.92rem;margin:.4rem 0 0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;max-width:640px;margin-bottom:1rem;flex-wrap:wrap}
+.btns{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}.link{background:none;border:0;color:var(--unt);text-decoration:underline;padding:.4rem 0;font-weight:700}
+.add{display:flex;gap:.6rem;margin-top:.5rem}.add input{flex:1}
+.clock{font:800 2.4rem var(--h);margin:.6rem 0 0}
+.sum{display:flex;gap:1.2rem;flex-wrap:wrap;margin:.8rem 0 1.2rem}.sum b{font:800 1.5rem var(--h);display:block;line-height:1.1}.sum span{color:var(--muted);font-size:.9rem}
+.ent{list-style:none;padding:0;margin:0}.ent li{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;padding:.8rem 0;border-bottom:1px solid var(--line)}.ent small{display:block;line-height:1.4}
+[hidden]{display:none!important}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav><div class="w"><strong>SCRAPP-E</strong><a href="index.html">Home</a><a href="updates.html">Updates</a><a href="gallery.html">Gallery</a><a href="references.html">References</a><a href="team.html">Team</a><a href="timecard.html" aria-current="page">Timecard</a></div></nav>
+<header class="hero"><div class="w"><h1>Timecard</h1><p>Sign in with your own account to record the time you spend on SCRAPP-E.</p></div></header>
+
+<main><div class="w">
+  <p class="note" id="setup" hidden>The database is not connected yet. Finish the setup steps, then this page will work.</p>
+
+  <section class="card" id="v-auth">
+    <h2>Sign in</h2>
+    <p class="hint">Use your own email address. If you are new, type your email and a password, then choose Create account. Your email must be on the team roster.</p>
+    <form id="signin"><label for="e">Email</label><input type="email" id="e" autocomplete="username" required>
+      <label for="p">Password</label><input type="password" id="p" autocomplete="current-password" required minlength="6">
+      <p class="msg" id="amsg" role="alert"></p>
+      <div class="btns"><button class="btn">Sign in</button><button class="btn ghost" type="button" id="create">Create account</button></div>
+      <button class="link" type="button" id="forgot">Forgot password?</button></form>
+  </section>
+
+  <section class="card" id="v-verify" hidden>
+    <h2>Verify your email</h2>
+    <p>We sent a link to <b id="vmail"></b>. Click it, then come back here. Check your spam folder if you do not see it.</p>
+    <p class="msg" id="vmsg" role="alert"></p>
+    <div class="btns"><button class="btn" id="vdone" type="button">I verified my email</button><button class="btn ghost" id="vsend" type="button">Send it again</button><button class="btn ghost" data-out type="button">Sign out</button></div>
+  </section>
+
+  <section class="card" id="v-nomember" hidden>
+    <h2>Not on the roster yet</h2>
+    <p><b id="nmail"></b> is not on the team roster. Ask the project lead to add it, then refresh this page.</p>
+    <button class="btn ghost" data-out type="button">Sign out</button>
+  </section>
+
+  <section class="card" id="v-profile" hidden>
+    <h2>Set up your profile</h2>
+    <p>Your name goes on every entry you record. <b>Once saved, it is permanently linked to your account</b> and you cannot change it, so check the spelling. The project lead can correct it if needed.</p>
+    <form id="prof"><div class="row"><div><label for="fn">First name</label><input type="text" id="fn" maxlength="40" autocomplete="given-name" required></div>
+      <div><label for="ln">Last name</label><input type="text" id="ln" maxlength="40" autocomplete="family-name" required></div></div>
+      <p class="msg" id="pmsg" role="alert"></p><div class="btns"><button class="btn">Save my name</button><button class="btn ghost" data-out type="button">Sign out</button></div></form>
+  </section>
+
+  <div id="v-app" hidden>
+    <div class="top"><b id="who"></b><button class="btn ghost" data-out type="button">Sign out</button></div>
+
+    <section class="card">
+      <h2>Clock</h2>
+      <label for="ts">Task</label><select id="ts"></select>
+      <label for="cn">Note (optional)</label><textarea id="cn" maxlength="300" placeholder="What are you working on?"></textarea>
+      <p class="clock" id="elapsed" hidden></p><p class="hint" id="since" hidden></p>
+      <div class="btns"><button class="btn" id="cin" type="button">Clock in</button><button class="btn" id="cout" type="button" hidden>Clock out</button></div>
+      <p class="msg" id="cmsg" role="alert"></p>
+    </section>
+
+    <section class="card">
+      <h2>Tasks</h2>
+      <p class="hint" style="margin-top:0">Tasks are shared with the whole team. Add one if you do not see it in the list.</p>
+      <form class="add" id="addtask"><input type="text" id="nt" maxlength="60" placeholder="New task name" aria-label="New task name"><button class="btn">Add task</button></form>
+      <p class="msg" id="tmsg" role="alert"></p>
+    </section>
+
+    <section class="card">
+      <h2>Add time I forgot to clock</h2>
+      <form id="manual"><label for="md">Date</label><input type="date" id="md" required>
+        <div class="row"><div><label for="mst">Start</label><input type="time" id="mst" required></div><div><label for="men">End</label><input type="time" id="men" required></div></div>
+        <label for="mts">Task</label><select id="mts"></select>
+        <label for="mn">Note (optional)</label><textarea id="mn" maxlength="300"></textarea>
+        <p class="msg" id="mmsg" role="alert"></p><button class="btn">Add entry</button></form>
+    </section>
+
+    <section class="card">
+      <h2>My time</h2>
+      <div class="sum"><div><b id="s-today">0h 0m</b><span>Today</span></div><div><b id="s-week">0h 0m</b><span>This week</span></div></div>
+      <ul class="ent" id="ent"></ul>
+    </section>
+  </div>
+</div></main>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a></div></footer>
+
+<script type="module">
+import {firebaseConfig as cfg} from './firebase-config.js';
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,addDoc,deleteDoc,collection,getDocs,query,where,orderBy,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+if(cfg.apiKey.startsWith('PASTE'))$('#setup').hidden=false;
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+const say=(id,t,ok)=>{const m=$(id);m.textContent=t||'';m.className='msg '+(ok?'ok':'err')};
+const views=['auth','verify','nomember','profile','app'],show=k=>views.forEach(v=>$('#v-'+v).hidden=v!==k);
+$$('[data-out]').forEach(b=>b.onclick=()=>signOut(auth));
+
+// ---- sign in, create account, reset password
+const em=()=>$('#e').value.trim().toLowerCase();
+$('#signin').onsubmit=async e=>{e.preventDefault();say('#amsg','');
+  try{await signInWithEmailAndPassword(auth,em(),$('#p').value)}
+  catch(x){say('#amsg',x.code==='auth/too-many-requests'?'Too many attempts. Wait a few minutes and try again.':'Wrong email or password.')}};
+$('#create').onclick=async()=>{say('#amsg','');if(!em()||$('#p').value.length<6){say('#amsg','Type your email and a password of at least 6 characters first.');return}
+  try{const c=await createUserWithEmailAndPassword(auth,em(),$('#p').value);await sendEmailVerification(c.user)}
+  catch(x){say('#amsg',x.code==='auth/email-already-in-use'?'An account with this email already exists. Choose Sign in instead.':x.code==='auth/invalid-email'?'That email address does not look right.':x.code==='auth/weak-password'?'Use a password with at least 6 characters.':'Could not create the account.')}};
+$('#forgot').onclick=async()=>{if(!em()){say('#amsg','Type your email above first.');return}
+  try{await sendPasswordResetEmail(auth,em())}catch(x){}say('#amsg','If an account exists for that email, a reset link is on its way.',true)};
+$('#vsend').onclick=async()=>{try{await sendEmailVerification(auth.currentUser);say('#vmsg','Sent again. Check your inbox.',true)}catch(x){say('#vmsg','Please wait a minute before asking for another email.')}};
+$('#vdone').onclick=()=>route(auth.currentUser);
+
+// ---- decide what to show for the signed-in person
+let me=null;
+async function route(u){
+  if(!u){me=null;show('auth');return}
+  try{await u.reload();if(!u.emailVerified){$('#vmail').textContent=u.email;say('#vmsg','');show('verify');return}
+    await u.getIdToken(true);const email=u.email.toLowerCase();
+    if(!(await getDoc(doc(db,'roster',email))).exists()){$('#nmail').textContent=u.email;show('nomember');return}
+    const p=await getDoc(doc(db,'profiles',u.uid));
+    if(!p.exists()){show('profile');return}
+    me={uid:u.uid,email,first:p.data().first,last:p.data().last};
+    $('#who').textContent='Signed in as '+me.first+' '+me.last;show('app');
+    $('#md').value=ymd(new Date());await Promise.all([loadTasks(),loadClock(),loadEntries()])}
+  catch(e){$('#nmail').textContent=u.email||'This account';show('nomember')}}
+onAuthStateChanged(auth,route);
+
+$('#prof').onsubmit=async e=>{e.preventDefault();const u=auth.currentUser,b=e.submitter;b.disabled=true;say('#pmsg','Saving...',true);
+  try{await setDoc(doc(db,'profiles',u.uid),{first:$('#fn').value.trim(),last:$('#ln').value.trim(),email:u.email.toLowerCase(),created:serverTimestamp()});await route(u)}
+  catch(x){say('#pmsg','Could not save your name. Check your connection and try again.')}b.disabled=false};
+
+// ---- helpers
+const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+const dur=m=>Math.floor(m/60)+'h '+pad(m%60)+'m',hms=ms=>{const s=Math.floor(ms/1000);return pad(Math.floor(s/3600))+':'+pad(Math.floor(s/60)%60)+':'+pad(s%60)};
+const slug=n=>n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+async function addEntry(start,end,task,note,source){
+  await addDoc(collection(db,'timeEntries'),{uid:me.uid,first:me.first,last:me.last,email:me.email,task,note,date:ymd(start),start:hm(start),end:hm(end),minutes:Math.max(1,Math.round((end-start)/60000)),source,created:serverTimestamp()})}
+
+// ---- tasks (shared by everyone)
+async function loadTasks(keep){
+  const s=await getDocs(query(collection(db,'tasks'),orderBy('name'))),names=s.docs.map(d=>d.data().name);
+  ['#ts','#mts'].forEach(id=>{const sel=$(id),cur=keep||sel.value;sel.innerHTML='';sel.append(new Option('No task',''));names.forEach(n=>sel.append(new Option(n,n)));sel.value=names.includes(cur)?cur:''})}
+$('#addtask').onsubmit=async e=>{e.preventDefault();const n=$('#nt').value.trim().replace(/\s+/g,' ');say('#tmsg','');
+  if(n.length<2||!slug(n)){say('#tmsg','Type a task name of at least 2 characters.');return}
+  try{await setDoc(doc(db,'tasks',slug(n)),{name:n,uid:me.uid,created:serverTimestamp()})}catch(x){/* it may already exist */}
+  await loadTasks();const found=[...$('#ts').options].find(o=>slug(o.value)===slug(n));
+  if(found){$('#ts').value=found.value;$('#mts').value=found.value;$('#nt').value='';say('#tmsg','Added and selected: '+found.value,true)}else say('#tmsg','Could not add that task. Check your connection and try again.')};
+
+// ---- clock in and out
+let clk=null;
+async function loadClock(){const s=await getDoc(doc(db,'clock',me.uid));clk=s.exists()?s.data():null;if(clk){await loadTasks(clk.task);$('#ts').value=clk.task||'';$('#cn').value=clk.note||''}drawClock()}
+function drawClock(){$('#cin').hidden=!!clk;$('#cout').hidden=!clk;$('#elapsed').hidden=$('#since').hidden=!clk;
+  if(clk){$('#since').textContent='Clocked in at '+hm(new Date(clk.startMs))+' on '+ymd(new Date(clk.startMs));$('#elapsed').textContent=hms(Date.now()-clk.startMs)}}
+setInterval(()=>{if(clk)$('#elapsed').textContent=hms(Date.now()-clk.startMs)},1000);
+$('#cin').onclick=async()=>{say('#cmsg','');const c={startMs:Date.now(),task:$('#ts').value,note:$('#cn').value.trim()};
+  try{await setDoc(doc(db,'clock',me.uid),c);clk=c;drawClock()}catch(e){say('#cmsg','Could not clock in. Check your connection and try again.')}};
+$('#cout').onclick=async()=>{say('#cmsg','');const end=new Date(),start=new Date(clk.startMs),mins=Math.round((end-start)/60000);
+  if(mins>720&&!confirm('This clock has been running for more than 12 hours. Save it as one entry anyway? You can delete it afterward and add the correct times instead.'))return;
+  try{await addEntry(start,end,$('#ts').value,$('#cn').value.trim(),'clock');await deleteDoc(doc(db,'clock',me.uid));clk=null;$('#cn').value='';drawClock();say('#cmsg','Saved '+dur(Math.max(1,mins))+'.',true);loadEntries()}
+  catch(e){say('#cmsg','Could not clock out. Your clock is still running. Try again.')}};
+
+// ---- add forgotten time
+$('#manual').onsubmit=async e=>{e.preventDefault();const b=e.submitter,s=new Date($('#md').value+'T'+$('#mst').value),n=new Date($('#md').value+'T'+$('#men').value);
+  if(!(n>s)){say('#mmsg','The end time must be after the start time on the same date.');return}
+  b.disabled=true;try{await addEntry(s,n,$('#mts').value,$('#mn').value.trim(),'manual');$('#mn').value='';say('#mmsg','Entry added.',true);loadEntries()}
+  catch(x){say('#mmsg','Could not add the entry. Check your connection and try again.')}b.disabled=false};
+
+// ---- my entries
+async function loadEntries(){
+  const s=await getDocs(query(collection(db,'timeEntries'),where('uid','==',me.uid))),rows=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+  const now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));const m0=ymd(mon),t0=ymd(now);
+  $('#s-today').textContent=dur(rows.filter(r=>r.date===t0).reduce((a,r)=>a+r.minutes,0));$('#s-week').textContent=dur(rows.filter(r=>r.date>=m0).reduce((a,r)=>a+r.minutes,0));
+  const ul=$('#ent');ul.innerHTML='';if(!rows.length)ul.innerHTML='<li>No time recorded yet.</li>';
+  rows.slice(0,60).forEach(r=>{const li=document.createElement('li'),d=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small'),x=document.createElement('button');
+    b.textContent=r.date+'   '+r.start+' to '+r.end+'   ('+dur(r.minutes)+')';sm.textContent=[r.task,r.note].filter(Boolean).join(': ')||'No task or note';d.append(b,sm);
+    x.className='btn del';x.type='button';x.textContent='Delete';x.onclick=async()=>{if(confirm('Delete this entry?')){await deleteDoc(doc(db,'timeEntries',r.id));loadEntries()}};li.append(d,x);ul.append(li)})}
+</script>
+</body>
+</html>
