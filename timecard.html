@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Timecard | SCRAPP-E</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.8rem;max-width:640px;margin-bottom:1.5rem}
+.card h2{margin-bottom:.4rem}label{display:block;font-weight:700;margin:1.1rem 0 .3rem}
+input[type=text],input[type=email],input[type=password],input[type=date],input[type=time],input[type=number],select,textarea{width:100%;padding:.6rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--unt);outline:none}textarea{min-height:90px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.hint{color:var(--muted);font-size:.92rem;margin:.4rem 0 0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;max-width:640px;margin-bottom:1rem;flex-wrap:wrap}
+.btns{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}.link{background:none;border:0;color:var(--unt);text-decoration:underline;padding:.4rem 0;font-weight:700}
+.add{display:flex;gap:.6rem;margin-top:.5rem}.add input{flex:1}
+.timer{font:800 clamp(3rem,12vw,4.6rem)/1 var(--h);text-align:center;margin:1.2rem 0 .2rem;color:var(--muted);letter-spacing:.02em}.timer.on{color:var(--unt)}
+.since{text-align:center;margin:0 auto 1rem;color:var(--muted)}
+.big{display:block;width:100%;font-size:1.5rem;padding:1rem;border-radius:16px;margin-top:.6rem}.go{background:var(--unt)}.stop{background:var(--red)}
+.chk{display:flex;gap:.6rem;align-items:center;font-weight:600;margin:1.1rem 0 0}.chk input{width:auto}
+.sum{display:flex;gap:1.2rem;flex-wrap:wrap;margin:.8rem 0 1.2rem}.sum b{font:800 1.5rem var(--h);display:block;line-height:1.1}.sum span{color:var(--muted);font-size:.9rem}
+.ent{list-style:none;padding:0;margin:0}.ent li{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;padding:.8rem 0;border-bottom:1px solid var(--line)}.ent small{display:block;line-height:1.4}
+[hidden]{display:none!important}
+@media(max-width:600px){.row,.row3{grid-template-columns:1fr}.row3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav><div class="w"><strong>SCRAPP-E</strong><a href="index.html">Home</a><a href="updates.html">Updates</a><a href="gallery.html">Gallery</a><a href="references.html">References</a><a href="team.html">Team</a><a href="timecard.html" aria-current="page">Timecard</a></div></nav>
+<header class="hero"><div class="w"><h1>Timecard</h1><p>Track the time you spend on SCRAPP-E.</p></div></header>
+
+<main><div class="w">
+  <p class="note" id="setup" hidden>The database is not connected yet. Finish the setup steps, then this page will work.</p>
+
+  <section class="card" id="v-auth">
+    <h2>Sign in</h2>
+    <p class="hint">Your account is created when the project lead adds your email to the roster. Use that email and the password you chose from the email Firebase sent you. If it never arrived, ask the project lead for your temporary password.</p>
+    <form id="signin"><label for="e">Email</label><input type="email" id="e" autocomplete="username" required>
+      <label for="p">Password</label><input type="password" id="p" autocomplete="current-password" required>
+      <p class="msg" id="amsg" role="alert"></p>
+      <div class="btns"><button class="btn">Sign in</button></div>
+      <button class="link" type="button" id="forgot">Forgot password? Email me a reset link</button></form>
+  </section>
+
+  <section class="card" id="v-nomember" hidden>
+    <h2>Not set up yet</h2>
+    <p><b id="nmail"></b> is not set up for the timecard. Ask the project lead to add this email to the roster.</p>
+    <button class="btn ghost" data-out type="button">Sign out</button>
+  </section>
+
+  <section class="card" id="v-profile" hidden>
+    <h2>Set up your profile</h2>
+    <p>Your name goes on every entry you record. <b>Once saved, it is permanently linked to your account</b> and you cannot change it, so check the spelling. The project lead can correct it if needed.</p>
+    <form id="prof"><div class="row"><div><label for="fn">First name</label><input type="text" id="fn" maxlength="40" autocomplete="given-name" required></div>
+      <div><label for="ln">Last name</label><input type="text" id="ln" maxlength="40" autocomplete="family-name" required></div></div>
+      <p class="msg" id="pmsg" role="alert"></p><div class="btns"><button class="btn">Save my name</button><button class="btn ghost" data-out type="button">Sign out</button></div></form>
+  </section>
+
+  <div id="v-app" hidden>
+    <div class="top"><b id="who"></b><button class="btn ghost" data-out type="button">Sign out</button></div>
+
+    <section class="card">
+      <h2>Track time</h2>
+      <label for="ts">Task</label><select id="ts"></select>
+      <label for="cn">Note (optional)</label><textarea id="cn" maxlength="300" placeholder="What are you working on?"></textarea>
+      <p class="timer" id="timer" aria-live="off">00:00:00</p><p class="since" id="since" hidden></p>
+      <button class="btn big go" id="go" type="button">Start</button>
+      <button class="btn big stop" id="stop" type="button" hidden>Stop</button>
+      <p class="hint" style="text-align:center">Press Start when you begin and Stop when you finish. The start and stop times are saved for you. The timer keeps running if you close this page.</p>
+      <p class="msg" id="cmsg" role="alert"></p>
+    </section>
+
+    <section class="card">
+      <h2>Add time manually</h2>
+      <p class="hint" style="margin-top:0">For time you forgot to track, or short work you want to log after the fact.</p>
+      <form id="manual"><label for="md">Date</label><input type="date" id="md" required>
+        <div id="m-range"><div class="row"><div><label for="mst">Start time</label><input type="time" id="mst"></div><div><label for="men">End time</label><input type="time" id="men"></div></div></div>
+        <div id="m-dur" hidden><div class="row3"><div><label for="mfin">Finished at</label><input type="time" id="mfin"></div><div><label for="mh">Hours</label><input type="number" id="mh" min="0" max="24" value="0"></div><div><label for="mm">Minutes</label><input type="number" id="mm" min="0" max="59" value="30"></div></div></div>
+        <label class="chk"><input type="checkbox" id="dm"> I only know how long I worked</label>
+        <label for="mts">Task</label><select id="mts"></select>
+        <label for="mn">Note (optional)</label><textarea id="mn" maxlength="300"></textarea>
+        <p class="msg" id="mmsg" role="alert"></p><button class="btn">Add entry</button></form>
+    </section>
+
+    <section class="card">
+      <h2>Tasks</h2>
+      <p class="hint" style="margin-top:0">Tasks are shared with the whole team. Add one if you do not see it in the list.</p>
+      <form class="add" id="addtask"><input type="text" id="nt" maxlength="60" placeholder="New task name" aria-label="New task name"><button class="btn">Add task</button></form>
+      <p class="msg" id="tmsg" role="alert"></p>
+    </section>
+
+    <section class="card">
+      <h2>My time</h2>
+      <div class="sum"><div><b id="s-today">0h 00m</b><span>Today</span></div><div><b id="s-week">0h 00m</b><span>This week</span></div></div>
+      <ul class="ent" id="ent"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Change my password</h2>
+      <form id="pwf"><label for="np">New password</label><input type="password" id="np" autocomplete="new-password" minlength="6" required>
+        <label for="np2">Type it again</label><input type="password" id="np2" autocomplete="new-password" minlength="6" required>
+        <p class="msg" id="wmsg" role="alert"></p><button class="btn">Change password</button></form>
+    </section>
+  </div>
+</div></main>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a></div></footer>
+
+<script type="module">
+import {firebaseConfig as cfg} from './firebase-config.js';
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,sendPasswordResetEmail,updatePassword,signOut} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,addDoc,deleteDoc,collection,getDocs,query,where,orderBy,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+if(cfg.apiKey.startsWith('PASTE'))$('#setup').hidden=false;
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+const say=(id,t,ok)=>{const m=$(id);m.textContent=t||'';m.className='msg '+(ok?'ok':'err')};
+const views=['auth','nomember','profile','app'],show=k=>views.forEach(v=>$('#v-'+v).hidden=v!==k);
+$$('[data-out]').forEach(b=>b.onclick=()=>signOut(auth));
+
+// ---- helpers
+const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+const t12=s=>{const [h,m]=s.split(':').map(Number);return((h%12)||12)+':'+pad(m)+' '+(h<12?'AM':'PM')};
+const fdate=s=>new Date(s+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+const dur=m=>Math.floor(m/60)+'h '+pad(m%60)+'m',hms=ms=>{const s=Math.max(0,Math.floor(ms/1000));return pad(Math.floor(s/3600))+':'+pad(Math.floor(s/60)%60)+':'+pad(s%60)};
+const slug=n=>n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+async function addEntry(start,end,task,note,source){
+  await addDoc(collection(db,'timeEntries'),{uid:me.uid,first:me.first,last:me.last,email:me.email,task,note,date:ymd(start),start:hm(start),end:hm(end),minutes:Math.max(1,Math.round((end-start)/60000)),source,created:serverTimestamp()})}
+
+// ---- sign in
+const em=()=>$('#e').value.trim().toLowerCase();
+$('#signin').onsubmit=async e=>{e.preventDefault();say('#amsg','');
+  try{await signInWithEmailAndPassword(auth,em(),$('#p').value)}
+  catch(x){say('#amsg',x.code==='auth/too-many-requests'?'Too many attempts. Wait a few minutes and try again.':'Wrong email or password.')}};
+$('#forgot').onclick=async()=>{if(!em()){say('#amsg','Type your email above first.');return}
+  try{await sendPasswordResetEmail(auth,em())}catch(x){}say('#amsg','If an account exists for that email, a reset link is on its way. Check your spam folder too.',true)};
+
+// ---- decide what to show for the signed-in person
+let me=null;
+async function route(u){
+  if(!u){me=null;show('auth');return}
+  try{
+    if(!(await getDoc(doc(db,'members',u.uid))).exists()){$('#nmail').textContent=u.email||'This account';show('nomember');return}
+    const p=await getDoc(doc(db,'profiles',u.uid));
+    if(!p.exists()){show('profile');return}
+    me={uid:u.uid,email:u.email.toLowerCase(),first:p.data().first,last:p.data().last};
+    $('#who').textContent='Signed in as '+me.first+' '+me.last;show('app');
+    $('#md').value=ymd(new Date());await Promise.all([loadTasks(),loadClock(),loadEntries()])}
+  catch(e){$('#nmail').textContent=(u&&u.email)||'This account';show('nomember')}}
+onAuthStateChanged(auth,route);
+$('#prof').onsubmit=async e=>{e.preventDefault();const u=auth.currentUser,b=e.submitter;b.disabled=true;say('#pmsg','Saving...',true);
+  try{await setDoc(doc(db,'profiles',u.uid),{first:$('#fn').value.trim(),last:$('#ln').value.trim(),email:u.email.toLowerCase(),created:serverTimestamp()});await route(u)}
+  catch(x){say('#pmsg','Could not save your name. Check your connection and try again.')}b.disabled=false};
+$('#pwf').onsubmit=async e=>{e.preventDefault();
+  if($('#np').value!==$('#np2').value){say('#wmsg','The two passwords do not match.');return}
+  try{await updatePassword(auth.currentUser,$('#np').value);$('#pwf').reset();say('#wmsg','Password changed.',true)}
+  catch(x){say('#wmsg',x.code==='auth/requires-recent-login'?'For security, sign out, sign back in, and then try again.':x.code==='auth/weak-password'?'Use a password with at least 6 characters.':'Could not change the password.')}};
+
+// ---- tasks (shared by everyone)
+async function loadTasks(keep){
+  const s=await getDocs(query(collection(db,'tasks'),orderBy('name'))),names=s.docs.map(d=>d.data().name);
+  ['#ts','#mts'].forEach(id=>{const sel=$(id),cur=keep||sel.value;sel.innerHTML='';sel.append(new Option('No task',''));names.forEach(n=>sel.append(new Option(n,n)));sel.value=names.includes(cur)?cur:''})}
+$('#addtask').onsubmit=async e=>{e.preventDefault();const n=$('#nt').value.trim().replace(/\s+/g,' ');say('#tmsg','');
+  if(n.length<2||!slug(n)){say('#tmsg','Type a task name of at least 2 characters.');return}
+  try{await setDoc(doc(db,'tasks',slug(n)),{name:n,uid:me.uid,created:serverTimestamp()})}catch(x){/* it may already exist */}
+  await loadTasks();const found=[...$('#ts').options].find(o=>o.value&&slug(o.value)===slug(n));
+  if(found){$('#ts').value=found.value;$('#mts').value=found.value;$('#nt').value='';say('#tmsg','Added and selected: '+found.value,true);saveClockFields()}else say('#tmsg','Could not add that task. Check your connection and try again.')};
+
+// ---- start and stop
+let clk=null;const cref=()=>doc(db,'clock',me.uid);
+async function loadClock(){const s=await getDoc(cref());clk=s.exists()?s.data():null;if(clk){await loadTasks(clk.task);$('#ts').value=clk.task||'';$('#cn').value=clk.note||''}drawClock()}
+function drawClock(){$('#go').hidden=!!clk;$('#stop').hidden=!clk;$('#since').hidden=!clk;$('#timer').classList.toggle('on',!!clk);
+  $('#timer').textContent=clk?hms(Date.now()-clk.startMs):'00:00:00';
+  if(clk)$('#since').textContent='Started at '+t12(hm(new Date(clk.startMs)))+' on '+fdate(ymd(new Date(clk.startMs)))}
+setInterval(()=>{if(clk)$('#timer').textContent=hms(Date.now()-clk.startMs)},1000);
+function saveClockFields(){if(clk){clk.task=$('#ts').value;clk.note=$('#cn').value.trim();setDoc(cref(),{task:clk.task,note:clk.note},{merge:true}).catch(()=>{})}}
+$('#ts').onchange=$('#cn').onchange=saveClockFields;
+$('#go').onclick=async()=>{say('#cmsg','');const c={startMs:Date.now(),task:$('#ts').value,note:$('#cn').value.trim()};
+  try{await setDoc(cref(),c);clk=c;drawClock()}catch(e){say('#cmsg','Could not start the timer. Check your connection and try again.')}};
+$('#stop').onclick=async()=>{say('#cmsg','');const end=new Date(),start=new Date(clk.startMs),mins=Math.max(1,Math.round((end-start)/60000));
+  if(mins>720&&!confirm('This timer has been running for more than 12 hours. Save it as one entry anyway? You can delete it afterward and add the correct times instead.'))return;
+  try{await addEntry(start,end,$('#ts').value,$('#cn').value.trim(),'timer');await deleteDoc(cref());clk=null;$('#cn').value='';drawClock();
+    say('#cmsg','Saved '+dur(mins)+': '+t12(hm(start))+' to '+t12(hm(end))+'.',true);loadEntries()}
+  catch(e){say('#cmsg','Could not stop the timer. It is still running. Try again.')}};
+
+// ---- add time manually (by start and end times, or by how long)
+$('#dm').onchange=()=>{const d=$('#dm').checked;$('#m-range').hidden=d;$('#m-dur').hidden=!d;if(d&&!$('#mfin').value)$('#mfin').value=hm(new Date())};
+$('#manual').onsubmit=async e=>{e.preventDefault();const b=e.submitter,day=$('#md').value;let s,n;
+  if($('#dm').checked){const mins=(+$('#mh').value||0)*60+(+$('#mm').value||0);
+    if(!$('#mfin').value||mins<1||mins>1440){say('#mmsg','Enter the time you finished and how long you worked (up to 24 hours).');return}
+    n=new Date(day+'T'+$('#mfin').value);s=new Date(n.getTime()-mins*60000)}
+  else{if(!$('#mst').value||!$('#men').value){say('#mmsg','Enter both a start time and an end time.');return}
+    s=new Date(day+'T'+$('#mst').value);n=new Date(day+'T'+$('#men').value);
+    if(!(n>s)){say('#mmsg','The end time must be after the start time on the same date.');return}}
+  b.disabled=true;try{await addEntry(s,n,$('#mts').value,$('#mn').value.trim(),'manual');$('#mn').value='';say('#mmsg','Added: '+t12(hm(s))+' to '+t12(hm(n))+'.',true);loadEntries()}
+  catch(x){say('#mmsg','Could not add the entry. Check your connection and try again.')}b.disabled=false};
+
+// ---- my entries
+async function loadEntries(){
+  const s=await getDocs(query(collection(db,'timeEntries'),where('uid','==',me.uid))),rows=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+  const now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));const m0=ymd(mon),t0=ymd(now);
+  $('#s-today').textContent=dur(rows.filter(r=>r.date===t0).reduce((a,r)=>a+r.minutes,0));$('#s-week').textContent=dur(rows.filter(r=>r.date>=m0).reduce((a,r)=>a+r.minutes,0));
+  const ul=$('#ent');ul.innerHTML='';if(!rows.length)ul.innerHTML='<li>No time recorded yet.</li>';
+  rows.slice(0,60).forEach(r=>{const li=document.createElement('li'),d=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small'),x=document.createElement('button');
+    b.textContent=fdate(r.date)+':  '+t12(r.start)+' to '+t12(r.end)+'  ('+dur(r.minutes)+')';sm.textContent=[r.task,r.note].filter(Boolean).join(': ')||'No task or note';d.append(b,sm);
+    x.className='btn del';x.type='button';x.textContent='Delete';x.onclick=async()=>{if(confirm('Delete this entry?')){await deleteDoc(doc(db,'timeEntries',r.id));loadEntries()}};li.append(d,x);ul.append(li)})}
+</script>
+</body>
+</html>

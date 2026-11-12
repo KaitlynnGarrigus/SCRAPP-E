@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Team login | SCRAPP-E</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.8rem;max-width:620px}
+label{display:block;font-weight:700;margin:1.1rem 0 .3rem}
+input[type=text],input[type=password],input[type=date],select,textarea{width:100%;padding:.65rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--unt);outline:none}textarea{min-height:170px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.prev{display:grid;gap:.8rem;margin-top:.8rem}.pv{display:flex;gap:.8rem;align-items:center;background:var(--paper);border-radius:12px;padding:.6rem}
+.pv img{width:84px;height:64px;object-fit:cover;border-radius:8px}.pv input{flex:1;padding:.4rem .7rem}
+.top{display:flex;justify-content:space-between;align-items:center;max-width:620px;margin-bottom:1rem}
+.mine{max-width:620px;margin-top:2.5rem}.mine li{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line)}
+.hint{color:var(--muted);font-size:.92rem;margin:.4rem 0 0}.mine ul{list-style:none;padding:0;margin:1rem 0 0}.mine small{color:var(--muted);display:block}
+table.tc{width:100%;border-collapse:collapse;font-size:.92rem}.tc th,.tc td{padding:.45rem .6rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.tc td.n{text-align:right}.tc th{background:#fff}
+[hidden]{display:none!important}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav><div class="w"><strong>SCRAPP-E</strong><a href="index.html">Home</a><a href="updates.html">Updates</a><a href="gallery.html">Gallery</a><a href="references.html">References</a><a href="https://kaitlynngarrigus.github.io/SCRAPP-E-Linkage-Analysis/" target="_blank" rel="noopener">Analysis</a><a href="team.html">Team</a><a href="admin.html" aria-current="page">Team login</a></div></nav>
+<header class="hero"><div class="w"><h1>Team login</h1><p>Sign in to post updates and manage references.</p></div></header>
+
+<main><div class="w">
+  <p class="note" id="setup" hidden>The database is not connected yet. Finish the setup steps, then this login will work.</p>
+
+  <form class="card" id="login" autocomplete="on">
+    <h2>Sign in</h2>
+    <label for="u">Username or email</label><input type="text" id="u" autocomplete="username" required>
+    <label for="p">Password</label><input type="password" id="p" autocomplete="current-password" required>
+    <p class="msg" id="lmsg" role="alert"></p>
+    <button class="btn" id="lbtn">Sign in</button>
+  </form>
+
+  <div id="panel" hidden>
+    <div class="top"><h2>New update</h2><button class="btn ghost" id="out">Sign out</button></div>
+    <p class="hint">Jump to: <a href="#post">New update</a> | <a href="#ref">References</a> | <a href="#roster">Team roster</a> | <a href="#tc">Timecards</a></p>
+    <form class="card" id="post">
+      <p class="note" id="pedit" hidden>Editing: <b id="pedt"></b> <button class="btn ghost" id="pcancel" type="button">Cancel editing</button></p>
+      <label for="a">Who is writing?</label>
+      <select id="a" required><option value="" disabled selected>Choose a team member</option></select>
+      <label for="t">Title</label><input type="text" id="t" maxlength="120" required>
+      <div class="row"><div><label for="d">Date</label><input type="date" id="d" required></div><div></div></div>
+      <label for="b">What happened?</label><textarea id="b" required></textarea>
+      <p class="hint" id="pexh" hidden>Current photos: edit a caption or remove one.</p><div class="prev" id="pex"></div>
+      <label for="f">Add photos (up to 4)</label><input type="file" id="f" accept="image/*" multiple>
+      <div class="prev" id="prev"></div>
+      <p class="msg" id="pmsg" role="alert"></p>
+      <button class="btn" id="pbtn">Publish update</button>
+    </form>
+    <div class="mine"><h2>Published posts</h2><ul id="list"></ul></div>
+    <div class="top" style="margin-top:3rem"><h2>Add a reference</h2></div>
+    <form class="card" id="ref">
+      <p class="note" id="redit" hidden>Editing: <b id="redt"></b> <button class="btn ghost" id="rcancel" type="button">Cancel editing</button></p>
+      <label for="rt">Title</label><input type="text" id="rt" maxlength="120" placeholder="Requirements Traceability Matrix" required>
+      <label for="rf">Folder</label><select id="rf" required></select>
+      <div id="rtw" hidden><label for="rtb">Tab</label><select id="rtb"></select></div>
+      <div id="rsw" hidden><label for="rsb">Section</label><select id="rsb"></select></div>
+      <label for="rd">Short description</label><textarea id="rd" style="min-height:90px" maxlength="300"></textarea>
+      <label for="ru">Link</label><input type="text" id="ru" placeholder="https://docs.google.com/..." required>
+      <p class="hint">For a Google Doc or Sheet: click Share, set General access to "Anyone with the link" (Viewer), then paste the link. You can also use a file uploaded to this website, such as RTM.xlsx.</p>
+      <p class="msg" id="rmsg" role="alert"></p>
+      <button class="btn" id="rbtn">Add reference</button>
+    </form>
+    <div class="mine"><h2>Published references</h2><ul id="rlist"></ul></div>
+    <div class="top" style="margin-top:3rem"><h2>Team roster</h2></div>
+    <form class="card" id="roster">
+      <p class="hint" style="margin-top:0">Adding an email creates that person's timecard account right away, so there is nothing for them to verify. Firebase also emails each person a link to choose their own password, and you get a temporary password here in case an email does not arrive.</p>
+      <label for="re">Add email addresses (one per line, or separated by commas)</label><textarea id="re" style="min-height:110px"></textarea>
+      <p class="msg" id="rostmsg" role="alert"></p><button class="btn">Add members</button>
+    </form>
+    <div class="card" id="provout" hidden></div>
+    <div class="mine"><h2>Roster</h2><ul id="l-roster"></ul></div>
+    <div class="mine"><h2>Tasks</h2><p class="hint">Members add these from the Timecard page. Remove any that are wrong or duplicated.</p><ul id="l-tasks"></ul></div>
+
+    <div class="top" style="margin-top:3rem"><h2>Timecards</h2></div>
+    <form class="card" id="tc" style="max-width:none">
+      <div class="row"><div><label for="tf">From</label><input type="date" id="tf" required></div><div><label for="tt">To</label><input type="date" id="tt" required></div></div>
+      <label for="tw">Member</label><select id="tw"><option value="">Everyone</option></select>
+      <p class="msg" id="tcmsg" role="alert"></p>
+      <button class="btn">Show entries</button> <button class="btn ghost" type="button" id="xl">Download Excel</button> <button class="btn ghost" type="button" id="cv">Download CSV</button>
+    </form>
+    <p id="tcsum" style="font-weight:700;margin-top:1.5rem"></p>
+    <div style="overflow-x:auto"><table class="tc" id="tctab"><thead><tr><th>Date</th><th>Member</th><th>Task</th><th>Time</th><th>Hours</th><th>Note</th><th></th></tr></thead><tbody></tbody></table></div>
+
+  </div>
+</div></main>
+
+<footer><div class="w">SCRAPP-E, a UNT Robotics project. <a href="index.html">Back to the main page</a></div></footer>
+
+<script type="module">
+import {members} from './members.js';
+import {folders} from './ref-folders.js';
+import {firebaseConfig as cfg} from './firebase-config.js';
+import {initializeApp,getApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,signOut,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getFirestore,collection,addDoc,getDocs,getDoc,deleteDoc,updateDoc,doc,query,orderBy,where,setDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const $=s=>document.querySelector(s);
+const DOMAIN='@scrappe-admin.example'; // a plain username (no @) is turned into this email; a full email is used as typed
+$('#a').innerHTML+=members.map(m=>`<option value="${m.n}">${m.n}, ${m.r}</option>`).join('');
+$('#d').valueAsDate=new Date();
+
+if(cfg.apiKey.startsWith('PASTE')){$('#setup').hidden=false;$('#lbtn').disabled=true}
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app);
+
+$('#login').onsubmit=async e=>{e.preventDefault();$('#lmsg').textContent='';$('#lmsg').className='msg';
+  try{const id=$('#u').value.trim().toLowerCase();await signInWithEmailAndPassword(auth,id.includes('@')?id:id+DOMAIN,$('#p').value)}
+  catch(err){$('#lmsg').textContent='Wrong username or password.';$('#lmsg').className='msg err'}};
+$('#out').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{$('#login').hidden=!!u;$('#panel').hidden=!u;if(u){$('#p').value='';loadList();loadRefs();loadRoster();loadTasks();loadTc()}});
+
+// Photos: shrunk in the browser so they fit in the database
+let items=[];
+async function enc(file,max,q){const b=await createImageBitmap(file),r=Math.min(1,max/Math.max(b.width,b.height)),c=document.createElement('canvas');
+  c.width=Math.round(b.width*r);c.height=Math.round(b.height*r);c.getContext('2d').drawImage(b,0,0,c.width,c.height);return c.toDataURL('image/jpeg',q)}
+async function encodeAll(budget=820000){for(const [m,q] of [[1000,.75],[800,.65],[640,.55],[500,.5]]){
+  const out=[];for(const it of items)out.push(await enc(it.file,m,q));
+  if(out.reduce((a,s)=>a+s.length,0)<budget)return out}throw new Error('size')}
+function drawPrev(){const p=$('#prev');p.innerHTML='';items.forEach((it,i)=>{const d=document.createElement('div');d.className='pv';
+  const im=document.createElement('img');im.src=URL.createObjectURL(it.file);im.alt='';
+  const c=document.createElement('input');c.type='text';c.placeholder='Caption (optional)';c.value=it.cap;c.maxLength=140;c.setAttribute('aria-label','Caption for photo '+(i+1));c.oninput=()=>it.cap=c.value;
+  const x=document.createElement('button');x.type='button';x.className='btn del';x.textContent='Remove';x.onclick=()=>{items.splice(i,1);drawPrev()};
+  d.append(im,c,x);p.append(d)})}
+$('#f').onchange=e=>{for(const f of e.target.files){if(items.length<4)items.push({file:f,cap:''})}e.target.value='';drawPrev()};
+
+const say=(t,ok)=>{$('#pmsg').textContent=t;$('#pmsg').className='msg '+(ok?'ok':'err')};
+let editPost=null,exPhotos=[];
+const photoBytes=l=>l.reduce((n,p)=>n+p.s.length,0);
+function drawEx(){const box=$('#pex');box.innerHTML='';$('#pexh').hidden=!exPhotos.length;
+  exPhotos.forEach((p,i)=>{const d=document.createElement('div');d.className='pv';const im=document.createElement('img');im.src=p.s;im.alt='';
+    const c=document.createElement('input');c.type='text';c.value=p.c||'';c.placeholder='Caption (optional)';c.maxLength=140;c.setAttribute('aria-label','Caption for current photo '+(i+1));c.oninput=()=>p.c=c.value;
+    const x=document.createElement('button');x.type='button';x.className='btn del';x.textContent='Remove';x.onclick=()=>{exPhotos.splice(i,1);drawEx()};
+    d.append(im,c);if(p.star){const s=document.createElement('span');s.className='hint';s.textContent='\u2605 On the home page';d.append(s)}d.append(x);box.append(d)})}
+function endEditPost(){editPost=null;exPhotos=[];$('#post').reset();$('#d').valueAsDate=new Date();items=[];drawPrev();drawEx();$('#pedit').hidden=true;$('#pbtn').textContent='Publish update'}
+function startEditPost(id,p){editPost=id;const a=$('#a');if(![...a.options].some(o=>o.value===p.author))a.append(new Option(p.author,p.author));
+  a.value=p.author;$('#t').value=p.title;$('#d').value=p.date;$('#b').value=p.body||'';items=[];drawPrev();exPhotos=(p.photos||[]).map(x=>({...x}));drawEx();
+  $('#pedt').textContent=p.title;$('#pedit').hidden=false;$('#pbtn').textContent='Save changes';$('#pmsg').textContent='';$('#post').scrollIntoView({behavior:'smooth',block:'start'})}
+$('#pcancel').onclick=endEditPost;
+$('#post').onsubmit=async e=>{e.preventDefault();$('#pbtn').disabled=true;say(editPost?'Saving...':'Publishing...',true);
+  try{let add=[];
+    if(items.length){const urls=await encodeAll(820000-photoBytes(exPhotos));add=urls.map((s,i)=>({s,c:items[i].cap.trim()}))}
+    const photos=[...exPhotos.map(p=>({...p,c:(p.c||'').trim()})),...add],data={author:$('#a').value,title:$('#t').value.trim(),date:$('#d').value,body:$('#b').value.trim(),photos,hasStar:photos.some(p=>p.star)};
+    if(editPost){await updateDoc(doc(db,'posts',editPost),data);endEditPost();say('Saved! The Updates page now shows your changes.',true)}
+    else{await addDoc(collection(db,'posts'),{...data,created:serverTimestamp()});$('#post').reset();$('#d').valueAsDate=new Date();items=[];drawPrev();say('Published! It is now on the Updates page.',true)}
+    loadList()
+  }catch(err){say(err.message==='size'?'Those photos are too large. Try fewer or smaller photos, or remove some current ones.':'Could not save. Check your connection and that you are signed in. Photos from some phones (HEIC) are not supported; use JPG or PNG.',false)}
+  $('#pbtn').disabled=false};
+
+async function loadList(){const ul=$('#list');ul.innerHTML='';
+  try{const s=await getDocs(query(collection(db,'posts'),orderBy('date','desc')));
+    if(s.empty)ul.innerHTML='<li>No posts yet.</li>';
+    s.forEach(d=>{const p=d.data(),li=document.createElement('li'),t=document.createElement('div');
+      t.innerHTML='<b></b><small></small>';t.firstChild.textContent=p.title;t.lastChild.textContent=p.author+' | '+p.date+(p.photos?.length?' | '+p.photos.length+' photo(s)':'');
+      const b=document.createElement('button');b.className='btn del';b.textContent='Delete';
+      b.onclick=async()=>{if(confirm('Delete "'+p.title+'"? This cannot be undone.')){await deleteDoc(doc(db,'posts',d.id));loadList()}};
+      const ed=document.createElement('button');ed.className='btn ghost';ed.type='button';ed.textContent='Edit';ed.onclick=()=>startEditPost(d.id,p);const acts=document.createElement('span');acts.style.display='flex';acts.style.gap='.5rem';acts.append(ed,b);li.append(t,acts);ul.append(li)})}catch(e){ul.innerHTML='<li>Could not load posts.</li>'}}
+
+// References
+folders.forEach(f=>$('#rf').append(new Option(f.n,f.n)));
+const tn=t=>typeof t==='string'?t:t.n;
+const tab=()=>$('#rtw').hidden?'':$('#rtb').value,sub=()=>$('#rsw').hidden?'':$('#rsb').value;
+function fillTabs(){const f=folders.find(x=>x.n===$('#rf').value),s=$('#rtb');s.innerHTML='';$('#rtw').hidden=!f||!f.tabs.length;
+  if(f&&f.tabs.length){s.append(new Option('No specific tab',''));f.tabs.forEach(t=>s.append(new Option(tn(t),tn(t))))}fillSubs()}
+function fillSubs(){const f=folders.find(x=>x.n===$('#rf').value),t=f&&f.tabs.find(x=>tn(x)===$('#rtb').value),subs=t&&typeof t!=='string'?(t.subs||[]):[],s=$('#rsb');s.innerHTML='';
+  $('#rsw').hidden=$('#rtw').hidden||!subs.length;if(subs.length){s.append(new Option('No specific section',''));subs.forEach(x=>s.append(new Option(x,x)))}}
+$('#rf').onchange=fillTabs;$('#rtb').onchange=fillSubs;fillTabs();
+const okUrl=u=>/^https?:\/\//i.test(u)||/^[\w][\w.\-\/]*$/.test(u);
+let editRef=null;
+function endEditRef(){editRef=null;$('#ref').reset();fillTabs();$('#redit').hidden=true;$('#rbtn').textContent='Add reference'}
+function startEditRef(id,r){editRef=id;$('#rt').value=r.title;if(r.folder&&[...$('#rf').options].some(o=>o.value===r.folder))$('#rf').value=r.folder;fillTabs();
+  if(!$('#rtw').hidden)$('#rtb').value=r.tab||'';fillSubs();if(!$('#rsw').hidden)$('#rsb').value=r.sub||'';
+  $('#rd').value=r.desc||'';$('#ru').value=r.url||'';$('#redt').textContent=r.title;$('#redit').hidden=false;$('#rbtn').textContent='Save changes';$('#rmsg').textContent='';$('#ref').scrollIntoView({behavior:'smooth',block:'start'})}
+$('#rcancel').onclick=endEditRef;
+$('#ref').onsubmit=async e=>{e.preventDefault();const m=$('#rmsg'),url=$('#ru').value.trim();
+  if(!okUrl(url)){m.textContent='Enter a link starting with https:// or a file name like RTM.xlsx.';m.className='msg err';return}
+  const data={title:$('#rt').value.trim(),folder:$('#rf').value,tab:tab(),sub:sub(),cat:sub()||tab()||$('#rf').value,desc:$('#rd').value.trim(),url};
+  try{if(editRef){await updateDoc(doc(db,'refs',editRef),data);endEditRef();m.textContent='Saved! The References page now shows your changes.'}
+    else{await addDoc(collection(db,'refs'),{...data,created:serverTimestamp()});$('#ref').reset();fillTabs();m.textContent='Added! It is now on the References page.'}
+    m.className='msg ok';loadRefs()}
+  catch(err){m.textContent='Could not save. Check that you are signed in and that the Firestore rules include references.';m.className='msg err'}};
+async function loadRefs(){const ul=$('#rlist');ul.innerHTML='';
+  try{const s=await getDocs(query(collection(db,'refs'),orderBy('created','desc')));
+    if(s.empty)ul.innerHTML='<li>No references yet.</li>';
+    s.forEach(d=>{const r=d.data(),li=document.createElement('li'),t=document.createElement('div');
+      t.innerHTML='<b></b><small></small>';t.firstChild.textContent=r.title;t.lastChild.textContent=r.folder?r.folder+(r.tab?' / '+r.tab:'')+(r.sub?' / '+r.sub:''):(r.cat||'');
+      const b=document.createElement('button');b.className='btn del';b.textContent='Delete';
+      b.onclick=async()=>{if(confirm('Delete "'+r.title+'"?')){await deleteDoc(doc(db,'refs',d.id));loadRefs()}};
+      const ed=document.createElement('button');ed.className='btn ghost';ed.type='button';ed.textContent='Edit';ed.onclick=()=>startEditRef(d.id,r);const acts=document.createElement('span');acts.style.display='flex';acts.style.gap='.5rem';acts.append(ed,b);li.append(t,acts);ul.append(li)})}catch(e){ul.innerHTML='<li>Could not load references.</li>'}}
+
+// ---- team roster and shared tasks
+const mails=t=>[...new Set((t.match(/[^\s,;<>]+@[^\s,;<>]+/g)||[]).map(x=>x.toLowerCase()))];
+const PW='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+const tempPw=()=>{const a=new Uint32Array(12);crypto.getRandomValues(a);return [...a].map(n=>PW[n%PW.length]).join('')};
+let sec=null;
+// Creates the member's account with a second Firebase connection, so you stay signed in as admin.
+async function provision(email){
+  if(!sec){try{sec=initializeApp(cfg,'provision')}catch(e){sec=getApp('provision')}}
+  const sa=getAuth(sec),pw=tempPw(),c=await createUserWithEmailAndPassword(sa,email,pw),uid=c.user.uid;
+  let mailed=false;try{await sendPasswordResetEmail(sa,email);mailed=true}catch(e){}
+  await signOut(sa);
+  await setDoc(doc(db,'members',uid),{email,added:serverTimestamp()});
+  await setDoc(doc(db,'roster',email),{email,uid,added:serverTimestamp()});
+  return{email,pw,mailed}}
+async function addEmails(l){const m=$('#rostmsg'),out=$('#provout');
+  if(!l.length){m.textContent='Enter at least one email address.';m.className='msg err';return}
+  m.textContent='Creating accounts...';m.className='msg ok';out.hidden=true;
+  try{await setDoc(doc(db,'members','_probe'),{t:serverTimestamp()});await deleteDoc(doc(db,'members','_probe'))}
+  catch(err){m.textContent='Could not save. Publish the new Firestore rules first (see the setup steps), and check that you are signed in with the admin account.';m.className='msg err';return}
+  const res=[];
+  for(const x of l){try{const ex=await getDoc(doc(db,'roster',x));if(ex.exists()&&ex.data().uid){res.push({email:x,note:'Already has an account.'});continue}res.push(await provision(x))}
+    catch(err){res.push({email:x,note:err.code==='auth/email-already-in-use'?'An account with this email already exists in Firebase. Delete it under Authentication, Users, then add the email again.':err.code==='auth/invalid-email'?'That email address is not valid.':'Could not create this account.'})}}
+  m.textContent='';showProv(res);loadRoster()}
+function showProv(res){const out=$('#provout');out.innerHTML='';out.hidden=false;
+  const h=document.createElement('h2'),p=document.createElement('p'),lines=[];h.textContent='Results';p.className='hint';
+  p.textContent='Temporary passwords are shown only once and are not saved anywhere. Each new person was also emailed a link to choose their own password. If an email does not arrive, give them the temporary password; they can change it on the Timecard page.';
+  out.append(h,p);
+  res.forEach(r=>{const d=document.createElement('p'),b=document.createElement('b');d.style.margin='.7rem 0 0';b.textContent=r.email;d.append(b,document.createElement('br'));
+    if(r.pw){const c=document.createElement('b');c.style.userSelect='all';c.textContent=r.pw;d.append('Temporary password: ',c,r.mailed?'  (email sent)':'  (the email could not be sent)');lines.push(r.email+'   '+r.pw)}else d.append(r.note);out.append(d)});
+  if(lines.length){const cp=document.createElement('button');cp.className='btn ghost';cp.type='button';cp.textContent='Copy list';cp.style.marginTop='1rem';
+    cp.onclick=async()=>{try{await navigator.clipboard.writeText(lines.join('\n'));cp.textContent='Copied'}catch(e){cp.textContent='Select and copy the passwords above'}};out.append(cp)}}
+$('#roster').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;await addEmails(mails($('#re').value));$('#re').value='';b.disabled=false};
+function row(ul,a,b,onDel,label){const li=document.createElement('li'),t=document.createElement('div');t.innerHTML='<b></b><small></small>';t.firstChild.textContent=a;t.lastChild.textContent=b;
+  const x=document.createElement('button');x.className='btn del';x.type='button';x.textContent='Remove';x.onclick=async()=>{if(confirm(label))await onDel()};li.append(t,x);ul.append(li)}
+async function loadRoster(){const ul=$('#l-roster');ul.innerHTML='';
+  try{const [r,p]=await Promise.all([getDocs(collection(db,'roster')),getDocs(collection(db,'profiles'))]),names={};p.forEach(d=>{const x=d.data();names[d.id]=x.first+' '+x.last});
+    if(r.empty)ul.innerHTML='<li>No one yet.</li>';
+    r.docs.sort((a,b)=>a.id.localeCompare(b.id)).forEach(d=>{const x=d.data(),li=document.createElement('li'),t=document.createElement('div'),acts=document.createElement('span');
+      t.innerHTML='<b></b><small></small>';t.firstChild.textContent=d.id;t.lastChild.textContent=x.uid?(names[x.uid]||'Account created. Has not set a name yet.'):'No account yet';
+      acts.style.display='flex';acts.style.gap='.5rem';acts.style.flexWrap='wrap';
+      const mk=(txt,cls,fn)=>{const b=document.createElement('button');b.className=cls;b.type='button';b.textContent=txt;b.onclick=fn;acts.append(b)};
+      if(!x.uid)mk('Create account','btn ghost',()=>addEmails([d.id]));
+      else mk('Email reset link','btn ghost',async()=>{try{await sendPasswordResetEmail(auth,d.id);alert('A password reset email was sent to '+d.id+'.')}catch(e){alert('Could not send the email.')}});
+      mk('Remove','btn del',async()=>{if(confirm('Remove '+d.id+'? They will lose access to the timecard.')){if(x.uid)await deleteDoc(doc(db,'members',x.uid));await deleteDoc(doc(db,'roster',d.id));loadRoster()}});
+      li.append(t,acts);ul.append(li)})}
+  catch(e){ul.innerHTML='<li>Could not load the roster.</li>'}}
+async function loadTasks(){const ul=$('#l-tasks');ul.innerHTML='';
+  try{const s=await getDocs(query(collection(db,'tasks'),orderBy('name')));if(s.empty)ul.innerHTML='<li>No tasks yet.</li>';
+    s.forEach(d=>row(ul,d.data().name,'',async()=>{await deleteDoc(doc(db,'tasks',d.id));loadTasks()},'Remove the task "'+d.data().name+'"? Past entries keep its name.'))}
+  catch(e){ul.innerHTML='<li>Could not load the tasks.</li>'}}
+
+// ---- timecards: view and export
+const p2=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),now=new Date();
+$('#tf').value=ymd(new Date(now.getFullYear(),now.getMonth(),1));$('#tt').value=ymd(now);
+let rows=[];const hrs=m=>(m/60).toFixed(2),full=r=>r.first+' '+r.last;
+async function loadTc(){const m=$('#tcmsg');m.textContent='Loading...';m.className='msg ok';
+  try{const s=await getDocs(query(collection(db,'timeEntries'),where('date','>=',$('#tf').value),where('date','<=',$('#tt').value),orderBy('date')));
+    rows=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+    const sel=$('#tw'),cur=sel.value,names=[...new Set(rows.map(full))].sort();sel.innerHTML='';sel.append(new Option('Everyone',''));names.forEach(n=>sel.append(new Option(n,n)));sel.value=names.includes(cur)?cur:'';
+    m.textContent='';drawTc()}
+  catch(e){m.textContent='Could not load. Check that you are signed in with the admin account and that the Firestore rules were updated.';m.className='msg err'}}
+const t12=s=>{const [h,m]=s.split(':').map(Number);return((h%12)||12)+':'+String(m).padStart(2,'0')+' '+(h<12?'AM':'PM')};
+const view=()=>rows.filter(r=>!$('#tw').value||full(r)===$('#tw').value);
+function drawTc(){const v=view(),tb=$('#tctab tbody');tb.innerHTML='';
+  v.forEach(r=>{const tr=document.createElement('tr');[r.date,full(r),r.task||'',t12(r.start)+' to '+t12(r.end),hrs(r.minutes),r.note||''].forEach((x,i)=>{const td=document.createElement('td');td.textContent=x;if(i===4)td.className='n';tr.append(td)});
+    const td=document.createElement('td'),b=document.createElement('button');b.className='btn del';b.type='button';b.textContent='Delete';b.onclick=async()=>{if(confirm('Delete this entry?')){await deleteDoc(doc(db,'timeEntries',r.id));loadTc()}};td.append(b);tr.append(td);tb.append(tr)});
+  const tot={};v.forEach(r=>tot[full(r)]=(tot[full(r)]||0)+r.minutes);
+  $('#tcsum').textContent=v.length?Object.entries(tot).map(([n,m])=>n+': '+hrs(m)+' h').join('   |   ')+'   |   Total: '+hrs(v.reduce((a,r)=>a+r.minutes,0))+' h':'No entries in this range.'}
+$('#tc').onsubmit=e=>{e.preventDefault();loadTc()};$('#tw').onchange=drawTc;
+function sheets(){const v=view(),tot={};v.forEach(r=>{const k=[r.first,r.last,r.email].join('\t');tot[k]=(tot[k]||0)+r.minutes});
+  return{data:[['Date','First name','Last name','Email','Task','Start','End','Hours','Note'],...v.map(r=>[r.date,r.first,r.last,r.email,r.task||'',r.start,r.end,+hrs(r.minutes),r.note||''])],
+         sum:[['First name','Last name','Email','Total hours'],...Object.entries(tot).map(([k,m])=>[...k.split('\t'),+hrs(m)])]}}
+const csv=a=>a.map(r=>r.map(c=>{c=String(c);if(/^[=+\-@]/.test(c))c="'"+c;return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c}).join(',')).join('\r\n');
+function dl(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+const fname=()=>'timecards_'+$('#tf').value+'_to_'+$('#tt').value;
+const saveCsv=d=>dl(fname()+'.csv',new Blob(['\ufeff'+csv(d)],{type:'text/csv'}));
+$('#cv').onclick=()=>{const {data}=sheets();if(data.length<2){alert('There are no entries to export. Choose a date range and click Show entries first.');return}saveCsv(data)};
+$('#xl').onclick=async()=>{const {data,sum}=sheets();if(data.length<2){alert('There are no entries to export. Choose a date range and click Show entries first.');return}
+  try{if(!window.XLSX)await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=ok;s.onerror=no;document.head.append(s)});
+    const X=window.XLSX,wb=X.utils.book_new(),a=X.utils.aoa_to_sheet(data);a['!cols']=[{wch:11},{wch:14},{wch:14},{wch:28},{wch:26},{wch:7},{wch:7},{wch:8},{wch:50}];
+    X.utils.book_append_sheet(wb,a,'Time entries');X.utils.book_append_sheet(wb,X.utils.aoa_to_sheet(sum),'Totals by member');X.writeFile(wb,fname()+'.xlsx')}
+  catch(e){saveCsv(data);alert('The Excel tool could not load, so a CSV file was downloaded instead. It opens in Excel.')}};
+</script>
+</body>
+</html>
